@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <algorithm>
+#include <string.h>
 
 
 #include "mars/comm/xlogger/xloggerbase.h"
@@ -101,10 +102,17 @@ void log_formater(const XLoggerInfo* _info, const char* _logbody, PtrBuffer& _lo
         }
 
         // _log.AllocWrite(30*1024, false);
-        int ret = snprintf((char*)_log.PosPtr(), 1024, "[%s][%s][%" PRIdMAX ", %" PRIdMAX "%s][%s][%s:%d, %s][",  // **CPPLINT SKIP**
-                           _logbody ? levelStrings[_info->level] : levelStrings[kLevelFatal], temp_time,
-                           _info->pid, _info->tid, _info->tid == _info->maintid ? "*" : "", _info->tag ? _info->tag : "",
-                           filename, _info->line, strFuncName);
+//        int ret = snprintf((char*)_log.PosPtr(), 1024, "[%s][%s][%" PRIdMAX ", %" PRIdMAX "%s][%s][%s:%d, %s][",  // **CPPLINT SKIP**
+//                           _logbody ? levelStrings[_info->level] : levelStrings[kLevelFatal], temp_time,
+//                           _info->pid, _info->tid, _info->tid == _info->maintid ? "*" : "", _info->tag ? _info->tag : "",
+//                           filename, _info->line, strFuncName);
+       int ret;
+       if(strcmp(_info->tag, "LOGCAT") == 0) {
+           ret = snprintf((char*)_log.PosPtr(), 1024, "%s", "");
+       } else {
+           ret = snprintf((char*)_log.PosPtr(), 1024, "[%s][%s][%s]", temp_time,
+                           _logbody ? levelStrings[_info->level] : levelStrings[kLevelFatal], _info->tag ? _info->tag : "");
+       }
 
         assert(0 <= ret);
         _log.Length(_log.Pos() + ret, _log.Length() + ret);
